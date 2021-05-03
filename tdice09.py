@@ -133,7 +133,7 @@ def draw_dice(squarenumber, numberofdice, attacking_mode = False):
             pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd, 18, 18))    
             pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd-20, 18, 18))
     else:
-        x_posd = x1*(sqwidth+6) + 722 -212 -10 + 6 - sqwidth
+        x_posd = x1*(sqwidth+6) + 510 - sqwidth
         y_posd = y1*(sqheight+6) + 235 - sqheight
         pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd+20, y_posd-20, 18, 18)) 
         pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd+20, y_posd, 18, 18))
@@ -153,11 +153,6 @@ def draw_dice(squarenumber, numberofdice, attacking_mode = False):
             pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd+20, 18, 18))
             pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd, 18, 18))    
             pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd-20, 18, 18))
-        #else:
-        #    pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd+40, 18, 18)) 
-        #    pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd+20, 18, 18))
-        #    pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd, 18, 18))    
-        #    pygame.draw.rect(screen, dice_colour, pygame.Rect(x_posd, y_posd-20, 18, 18))
 
 def hovering_new_game_button():
     if 1766 <= pygame.mouse.get_pos()[0] <= 1886 and 28 <= pygame.mouse.get_pos()[1] <= 148:
@@ -673,155 +668,151 @@ def aigaming(player):
                 #print("Neighbours:")
                 #print(neighbour_list1)
 
-                target_list = []
-                for m in neighbour_list1:
-                    target_list.append((m, running_dice_list[m]))
-                if len(target_list) > 0:
-                    target = target_list[0]
-                    if len(target_list) > 1:
-                        for n in target_list:
-                            if n[1] < target[1]:
-                                target = n
-                
-                    #print("Player:")
-                    #print(player)
-                    #print("Attacker")
-                    #print(i)
-                    #print("Target")
-                    #print(target)
+                if p1_sq_count < 12:
+                    target_list = []
+                    for m in neighbour_list1:
+                        target_list.append((m, running_dice_list[m]))
+                    if len(target_list) > 0:
+                        target = target_list[0]
+                        if len(target_list) > 1:
+                            for n in target_list:
+                                if n[1] < target[1]:
+                                    target = n
 
-                    if i[1] == 8 or i[1] > target[1]:
-                        #print("Attack begins")
-                        fighting_pair = [i[0], target[0]]
-                        #print("Fighting pair")
-                        #print(fighting_pair)
+                        if i[1] == 8 or i[1] > target[1]:
+                            #print("** Attack begins **")
+                            fighting_algorithm(i, target, player)
+                else:
+                    target_list = []
+                    for m in neighbour_list1:
+                        if running_player_list[m] == 1 or running_player_list[m] == 0:
+                            target_list.append((m, running_dice_list[m]))
+                    if len(target_list) > 0:
+                        target = target_list[0]
+                        if len(target_list) > 1:
+                            for n in target_list:
+                                if n[1] < target[1]:
+                                    target = n
+                        if i[1] == 8 or i[1] > target[1]:
+                            #print("** Attack begins **")
+                            fighting_algorithm(i, target, player)
                         
-                        dice1 = i[1]
-                        dice2 = target[1]     
-
-                        #print("Dice pair")
-                        #print(dice1, dice2)
-                        
-                        dicesum1 = 0
-                        dicesum2 = 0
-
-                        dice_list1 = []
-                        dice_list2 = []
-                        
-                        while dice1>0:
-                            roll1 = random.randint(1,6)
-                            dicesum1 += roll1
-                            dice_list1.append(roll1)
-                            dice1 -= 1
-                        while dice2>0:
-                            roll2 = random.randint(1,6)
-                            dicesum2 += roll2
-                            dice_list2.append(roll2)
-                            dice2 -= 1
-
-                        #new approach with lists and another function just to process
-                        attacker_info = []
-                        defender_info = []
-                        gamelog_info = []
-
-                        str1 = "P"+str(running_player_list[fighting_pair[0]])+" rolled a "+str(dicesum1)+" with "+str(dice_list1).strip("[]")
-                        if running_player_list[fighting_pair[1]] != 0:
-                            str2 = "P"+str(running_player_list[fighting_pair[1]])+" rolled a "+str(dicesum2)+" with "+str(dice_list2).strip("[]")
-                        else:
-                            str2 = "Grey rolled a "+str(dicesum2)+" with "+str(dice_list2).strip("[]")
-                  
-                        gamelog_info.append(str1)
-                        gamelog_info.append(str2)
-
-                        if dicesum1 > dicesum2:
-                            #print("Attacker wins")
-                            str3 = "P"+str(running_player_list[fighting_pair[0]])+" wins"
-                            winner_colour = running_colour_list[player]
-                            
-                            gamelog_info.append(str3)
-                            gamelog_info.append(winner_colour)
-                            
-                            attacker_info.append(player)
-                            attacker_info.append(fighting_pair[0])
-                            attacker_info.append(1)
-                            attacker_info.append(winner_colour)
-                            
-                            defender_info.append(player)
-                            defender_info.append(fighting_pair[1])
-                            defender_info.append(running_dice_list[fighting_pair[0]]-1)
-                            defender_info.append(winner_colour)
-
-                            #attacking_mode = False
-                            '''
-                            running_player_list[fighting_pair[1]] = player
-                            running_dice_list[fighting_pair[1]] = running_dice_list[fighting_pair[0]]-1
-                            running_dice_list[fighting_pair[0]] = 1
-                            '''
-                            #draw_squares([fighting_pair[1]], running_colour_list[player])
-                            #draw_dice(fighting_pair[1], running_dice_list[fighting_pair[1]])
-                            #draw_squares([fighting_pair[0]], running_colour_list[player])
-                            #draw_dice(fighting_pair[0], running_dice_list[fighting_pair[0]])
-                            
-                            #p1_sq_list.append(fighting_pair[1])
-                            #print("running_player_list Right after attack")
-                            #print(running_player_list)
-                            fighting_pair = []
-                            #pause_hovering = False
-
-                        else:
-                            #print("Defender wins")
-                            if running_player_list[fighting_pair[1]] != 0:
-                                str3 = "P"+str(running_player_list[fighting_pair[1]])+" wins"
-                            else:
-                                str3 = "Grey wins"
-                            winner_colour = running_colour_list[running_player_list[fighting_pair[1]]]
-
-                            gamelog_info.append(str3)
-                            gamelog_info.append(winner_colour)
-                            
-                            attacker_info.append(player)
-                            attacker_info.append(fighting_pair[0])
-                            attacker_info.append(1)
-                            attacker_info.append(running_colour_list[player])
-                            
-                            defender_info.append(running_player_list[fighting_pair[1]])
-                            defender_info.append(fighting_pair[1])
-                            defender_info.append(running_dice_list[fighting_pair[1]])
-                            defender_info.append(running_colour_list[running_player_list[fighting_pair[1]]])
-
-                            #attacking_mode = False
-                            #draw_squares([fighting_pair[1]], running_colour_list[running_player_list[fighting_pair[1]]])
-                            #draw_dice(fighting_pair[1], running_dice_list[fighting_pair[1]])
-                            #running_dice_list[fighting_pair[0]] = 1
-                            #draw_squares([fighting_pair[0]], running_colour_list[player])
-                            #draw_dice(fighting_pair[0], 1)
-                            fighting_pair = []
-                            #pause_hovering = False
-
-                        ai_round_list.append([attacker_info, defender_info, gamelog_info])
-
-                        '''
-                        gamelog.insert(0, [str1, str2, str3, winner_colour])
-                        #gamelog.insert(0, round_result)
-                        if len(gamelog) > 11:
-                            del gamelog[-1]
-
-                        btmline = 1008
-
-                        pygame.draw.rect(screen, panelcolour, pygame.Rect(22, 190, 400, 920)) 
-
-                        for i in range(len(gamelog)):
-                            log_surface = log_font.render(str(gamelog[i][0]), True, logcolour) 
-                            log_rect = log_surface.get_rect(midleft = (32, btmline-80*i)) 
-                            screen.blit(log_surface, log_rect)
-                            log_surface = log_font.render(str(gamelog[i][1]), True, logcolour) 
-                            log_rect = log_surface.get_rect(midleft = (32, btmline+22-80*i)) 
-                            screen.blit(log_surface, log_rect)
-                            log_surface = log_font.render(str(gamelog[i][2]), True, gamelog[i][-1]) 
-                            log_rect = log_surface.get_rect(midleft = (32, btmline+44-80*i)) 
-                            screen.blit(log_surface, log_rect)
-                        '''
         return(ai_round_list)
+
+def fighting_algorithm(i, target, player):
+    fighting_pair = [i[0], target[0]]
+    #print("Fighting pair")
+    #print(fighting_pair)
+    
+    dice1 = i[1]
+    dice2 = target[1]     
+
+    #print("Dice pair")
+    #print(dice1, dice2)
+    
+    dicesum1 = 0
+    dicesum2 = 0
+
+    dice_list1 = []
+    dice_list2 = []
+    
+    while dice1>0:
+        if running_player_list[target[0]] == 1 and p1_sq_count > 18:
+            roll1 = random.randint(2,6)
+        else:
+            roll1 = random.randint(1,6)
+        dicesum1 += roll1
+        dice_list1.append(roll1)
+        dice1 -= 1
+    while dice2>0:
+        roll2 = random.randint(1,6)
+        dicesum2 += roll2
+        dice_list2.append(roll2)
+        dice2 -= 1
+
+    #new approach with lists and another function just to process
+    attacker_info = []
+    defender_info = []
+    gamelog_info = []
+
+    str1 = "P"+str(running_player_list[fighting_pair[0]])+" rolled a "+str(dicesum1)+" with "+str(dice_list1).strip("[]")
+    if running_player_list[fighting_pair[1]] != 0:
+        str2 = "P"+str(running_player_list[fighting_pair[1]])+" rolled a "+str(dicesum2)+" with "+str(dice_list2).strip("[]")
+    else:
+        str2 = "Grey rolled a "+str(dicesum2)+" with "+str(dice_list2).strip("[]")
+
+    gamelog_info.append(str1)
+    gamelog_info.append(str2)
+
+    if dicesum1 > dicesum2:
+        #print("Attacker wins")
+        str3 = "P"+str(running_player_list[fighting_pair[0]])+" wins"
+        winner_colour = running_colour_list[player]
+        
+        gamelog_info.append(str3)
+        gamelog_info.append(winner_colour)
+        
+        attacker_info.append(player)
+        attacker_info.append(fighting_pair[0])
+        attacker_info.append(1)
+        attacker_info.append(winner_colour)
+        
+        defender_info.append(player)
+        defender_info.append(fighting_pair[1])
+        defender_info.append(running_dice_list[fighting_pair[0]]-1)
+        defender_info.append(winner_colour)
+
+        #attacking_mode = False
+        
+        '''
+        running_player_list[fighting_pair[1]] = player
+        
+        running_dice_list[fighting_pair[1]] = running_dice_list[fighting_pair[0]]-1
+        running_dice_list[fighting_pair[0]] = 1
+        '''
+        #draw_squares([fighting_pair[1]], running_colour_list[player])
+        #draw_dice(fighting_pair[1], running_dice_list[fighting_pair[1]])
+        #draw_squares([fighting_pair[0]], running_colour_list[player])
+        #draw_dice(fighting_pair[0], running_dice_list[fighting_pair[0]])
+        
+        #p1_sq_list.append(fighting_pair[1])
+        #print("running_player_list Right after attack")
+        #print(running_player_list)
+        fighting_pair = []
+        #pause_hovering = False
+
+    else:
+        #print("Defender wins")
+        if running_player_list[fighting_pair[1]] != 0:
+            str3 = "P"+str(running_player_list[fighting_pair[1]])+" wins"
+        else:
+            str3 = "Grey wins"
+        winner_colour = running_colour_list[running_player_list[fighting_pair[1]]]
+
+        gamelog_info.append(str3)
+        gamelog_info.append(winner_colour)
+        
+        attacker_info.append(player)
+        attacker_info.append(fighting_pair[0])
+        attacker_info.append(1)
+        attacker_info.append(running_colour_list[player])
+        
+        defender_info.append(running_player_list[fighting_pair[1]])
+        defender_info.append(fighting_pair[1])
+        defender_info.append(running_dice_list[fighting_pair[1]])
+        defender_info.append(running_colour_list[running_player_list[fighting_pair[1]]])
+
+        #attacking_mode = False
+        #draw_squares([fighting_pair[1]], running_colour_list[running_player_list[fighting_pair[1]]])
+        #draw_dice(fighting_pair[1], running_dice_list[fighting_pair[1]])
+        #running_dice_list[fighting_pair[0]] = 1
+        #draw_squares([fighting_pair[0]], running_colour_list[player])
+        #draw_dice(fighting_pair[0], 1)
+        fighting_pair = []
+        #pause_hovering = False
+
+    ai_round_list.append([attacker_info, defender_info, gamelog_info])
+    return(ai_round_list)
 
 def ai_processing_one(ai_round_item, current_turn):
     print("ai_round_item")
@@ -1020,15 +1011,17 @@ while True:
                 
                 if ai_round_action_num > 0:
 
-                    #reaction_time1 = [50, 60]
-                    picked_reaction_time1 = 92
+                    #picked_reaction_time1 = 96
+                    #reaction_time1 = [88, 98, 108]
+                    #picked_reaction_time1 = random.choice(reaction_time1)
+                    #picked_reaction_time1 = 92 
                     #reaction_time2 = [30, 40]
                     #picked_reaction_time2 = random.choice(reaction_time2)
-                    picked_reaction_time2 = 62
+                    #picked_reaction_time2 = 68
                     
-                    if timeleftunit == picked_reaction_time1:
+                    if timeleftunit == 96:
                         ai_processing_one(ai_round_list[0], current_turn)
-                    if timeleftunit == picked_reaction_time2:
+                    if timeleftunit == 68:
                         ai_processing_two(ai_round_list[0], current_turn)
                         timeleftunit = 120
 
@@ -1101,7 +1094,7 @@ while True:
                             #hover_sq_list = []
                             #hover_sq_list.append(hover_sq_num)
                             clicking_pair.append(hover_sq_num)
-                            print("Clean slate, can attack")
+                            #print("Clean slate, can attack")
 
                             #attacking_mode = True
                             #print(clicking_pair)
@@ -1161,7 +1154,10 @@ while True:
                                     dice_list1.append(roll1)
                                     dice1 -= 1
                                 while dice2>0:
-                                    roll2 = random.randint(1,6)
+                                    if p1_sq_count > 18:
+                                        roll2 = random.randint(2,6)
+                                    else:
+                                        roll2 = random.randint(1,6)
                                     dicesum2 += roll2
                                     dice_list2.append(roll2)
                                     dice2 -= 1
@@ -1217,7 +1213,7 @@ while True:
                             else:
                                 neighbour = False
                                 attacking_mode = False
-                                print("Need to clean up")
+                                #print("Need to clean up")
                                 clicking_pair = []
                                 pause_hovering = False
                             #print("Entering attacking mode")
@@ -1226,10 +1222,12 @@ while True:
                             
                         else:
                             if len(clicking_pair) == 0:
-                                print("First square isn't P1, won't work")
+                                pass
+                                #print("First square isn't P1, won't work")
                                 
                             else:
-                                print("Won't work, need to clean up")
+                                pass
+                                #print("Won't work, need to clean up")
 
                             attacking_mode = False    
                             pause_hovering = False
@@ -1314,13 +1312,6 @@ while True:
             for i in p1_sq_list:
                 draw_dice(i, running_dice_list[i])
     
-    #print("Trying this")
-    #print(running_player_list.index(1))
-
-    #print("Trying this")
-    #for index, "1" in enumerate(running_player_list):
-    #    print index, "1"
-
     #print(p1_colour)
 
     #print(running_colour_list)
@@ -1357,13 +1348,13 @@ while True:
             len1 += 359 - sumof7
             sumof7 = 359
 
-        pygame.draw.rect(screen, p1_colour, pygame.Rect(35, 158, len1, 20)) 
-        pygame.draw.rect(screen, running_colour_list[2], pygame.Rect(35+len1, 158, len2, 20)) 
-        pygame.draw.rect(screen, running_colour_list[3], pygame.Rect(35+len1+len2, 158, len3, 20)) 
-        pygame.draw.rect(screen, running_colour_list[4], pygame.Rect(35+len1+len2+len3, 158, len4, 20))      
-        pygame.draw.rect(screen, running_colour_list[5], pygame.Rect(35+len1+len2+len3+len4, 158, len5, 20)) 
-        pygame.draw.rect(screen, running_colour_list[6], pygame.Rect(35+len1+len2+len3+len4+len5, 158, len6, 20)) 
-        pygame.draw.rect(screen, running_colour_list[7], pygame.Rect(35+len1+len2+len3+len4+len5+len6, 158, len7, 20)) 
+        pygame.draw.rect(screen, p1_colour, pygame.Rect(35, 160, len1, 20)) 
+        pygame.draw.rect(screen, running_colour_list[2], pygame.Rect(35+len1, 160, len2, 20)) 
+        pygame.draw.rect(screen, running_colour_list[3], pygame.Rect(35+len1+len2, 160, len3, 20)) 
+        pygame.draw.rect(screen, running_colour_list[4], pygame.Rect(35+len1+len2+len3, 160, len4, 20))      
+        pygame.draw.rect(screen, running_colour_list[5], pygame.Rect(35+len1+len2+len3+len4, 160, len5, 20)) 
+        pygame.draw.rect(screen, running_colour_list[6], pygame.Rect(35+len1+len2+len3+len4+len5, 160, len6, 20)) 
+        pygame.draw.rect(screen, running_colour_list[7], pygame.Rect(35+len1+len2+len3+len4+len5+len6, 160, len7, 20)) 
 
         for i in (len2, len3, len4, len5, len6, len7):
             if i == 0:
